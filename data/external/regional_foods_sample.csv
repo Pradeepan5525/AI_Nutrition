@@ -1,0 +1,11 @@
+food_id,name,category,food_type,kcal_100g,protein_100g,fat_100g,sat_fat_100g,carbs_100g,sugar_100g,fiber_100g,sodium_mg_100g,cholesterol_mg_100g,calcium_mg_100g,iron_mg_100g,vitamin_c_mg_100g,allergens,dietary_tags
+ext_001,"Dal Tadka (Lentil Curry)",Legumes & Nuts,Vegetables,116.0,6.8,3.2,0.5,15.2,1.1,4.5,280.0,0.0,38.0,2.1,4.2,none,"vegetarian,vegan,gluten_free,dairy_free"
+ext_002,Paneer Tikka,Dairy & Egg,Proteins,240.0,16.5,18.0,9.5,4.2,2.0,1.2,420.0,45.0,380.0,1.4,3.0,dairy,"vegetarian,gluten_free"
+ext_003,Hummus Tahini,Legumes & Nuts,Snacks,166.0,7.9,9.6,1.4,14.3,0.3,6.0,380.0,0.0,38.0,2.4,8.0,none,"vegetarian,vegan,gluten_free,dairy_free"
+ext_004,Tabbouleh Salad,Vegetables,Vegetables,112.0,2.8,7.2,1.0,9.8,1.2,3.1,190.0,0.0,45.0,1.8,22.0,gluten,"vegetarian,vegan,dairy_free"
+ext_005,"Corn Tortilla (Traditional)",Grains & Pasta,Grains,218.0,5.7,2.8,0.4,45.0,0.8,6.3,45.0,0.0,84.0,1.5,0.0,none,"vegetarian,vegan,gluten_free,dairy_free,low_sodium"
+ext_006,"Kimchi (Fermented Cabbage)",Vegetables,Vegetables,23.0,1.8,0.5,0.1,3.9,1.5,2.4,560.0,0.0,52.0,1.2,18.0,fish,vegetarian_unverified
+ext_007,"Miso Soup (Tofu & Wakame)",Meals & Entrees,Vegetables,35.0,2.8,1.2,0.2,3.8,1.1,0.9,490.0,0.0,30.0,0.8,0.5,soy,"vegetarian,vegan,gluten_free,dairy_free"
+ext_008,Steamed Edamame,Legumes & Nuts,Vegetables,122.0,11.9,5.2,0.6,8.9,2.2,5.2,6.0,0.0,63.0,2.3,6.1,soy,"vegetarian,vegan,gluten_free,dairy_free,low_sodium"
+ext_009,"Roti (Whole Wheat Flatbread)",Grains & Pasta,Grains,264.0,9.0,3.5,0.8,50.0,1.5,7.0,140.0,0.0,32.0,2.8,0.0,gluten,"vegetarian,vegan,dairy_free"
+ext_010,"Guacamole (Fresh Avocado)",Vegetables,Snacks,157.0,2.0,14.7,2.1,8.5,0.7,6.7,220.0,0.0,12.0,0.6,10.0,none,"vegetarian,vegan,gluten_free,dairy_free"

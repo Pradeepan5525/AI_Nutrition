@@ -1,0 +1,86 @@
+# Clinical Nutrition Rules and Guidelines Configuration
+
+conditions:
+  hypertension:
+    name: "Hypertension / Elevated Blood Pressure"
+    citation: "AHA/ACC Guideline for the Prevention, Detection, Evaluation, and Management of High Blood Pressure in Adults (2017) & DASH Trials"
+    description: "Dietary Approaches to Stop Hypertension (DASH) pattern focusing on sodium reduction, mineral density, and vascular health."
+    constraints:
+      max_sodium_mg:
+        value: 1500.0
+        unit: "mg/day"
+        reason: "AHA DASH guideline recommends <= 1,500 mg/day for optimal blood pressure reduction."
+      min_fiber_per_1000kcal:
+        value: 16.0
+        unit: "g/1000kcal"
+        reason: "Higher dietary fiber promotes endothelial function and mineral bioavailability."
+    guidance:
+      - "Cap daily sodium at 1,500 mg; avoid added table salt and ultra-processed canned/cured foods."
+      - "Prioritize potassium- and magnesium-dense whole foods (leafy greens, legumes, avocados, berries)."
+      - "Limit cured and processed meats (bacon, cold cuts, hot dogs, sausage)."
+
+  diabetes:
+    name: "Type 2 Diabetes / Dysglycemia"
+    citation: "American Diabetes Association (ADA) Standards of Care in Diabetes (2024)"
+    description: "Glycemic management emphasizing complex high-fiber carbohydrates, minimal free sugars, and meal carb spacing."
+    constraints:
+      max_sugar_pct_kcal:
+        value: 5.0
+        unit: "% of total kcal"
+        reason: "ADA guidelines recommend minimizing free and added sugars to <= 5% of energy."
+      min_fiber_per_1000kcal:
+        value: 18.0
+        unit: "g/1000kcal"
+        reason: "Viscous soluble fiber slows carbohydrate absorption and blunts postprandial glycemic excursions."
+    guidance:
+      - "Replace high-glycemic refined starches with legumes, intact whole grains, and non-starchy vegetables."
+      - "Distribute carbohydrate allowances evenly across breakfast, lunch, and dinner to prevent glycemic spikes."
+      - "Pair carbohydrate sources with protein and healthy fats to slow gastric emptying."
+
+  high_cholesterol:
+    name: "Hypercholesterolemia / Dyslipidemia"
+    citation: "AHA/ACC Guideline on the Management of Blood Cholesterol (2018) & NCEP ATP III"
+    description: "Cardiovascular risk reduction through strict saturated fat limitation and soluble fiber enhancement."
+    constraints:
+      max_sat_fat_pct_kcal:
+        value: 7.0
+        unit: "% of total kcal"
+        reason: "AHA recommends saturated fat <= 6-7% of total energy to lower LDL cholesterol."
+      max_cholesterol_mg:
+        value: 200.0
+        unit: "mg/day"
+        reason: "NCEP ATP III recommends limiting dietary cholesterol to <= 200 mg/day in dyslipidemia."
+      min_fiber_per_1000kcal:
+        value: 16.0
+        unit: "g/1000kcal"
+        reason: "Soluble beta-glucans and pectins bind intestinal bile acids, accelerating LDL clearance."
+    guidance:
+      - "Strictly limit tropical oils (palm, coconut), fatty red meats, full-fat butter, and heavy cream."
+      - "Emphasize foods rich in soluble fiber (oats, barley, beans, lentils, Brussels sprouts, apples)."
+      - "Substitute saturated fats with monounsaturated and polyunsaturated fats (olive oil, nuts, seeds)."
+
+  obesity:
+    name: "Overweight / Obesity"
+    citation: "AHA/ACC/TOS Guideline for the Management of Overweight and Obesity in Adults (2013)"
+    description: "Evidence-based caloric deficit with elevated protein to preserve lean muscle mass and promote satiety."
+    constraints:
+      min_protein_g_per_kg:
+        value: 1.4
+        unit: "g/kg body weight"
+        reason: "High protein (1.2-1.6 g/kg) preserves lean muscle mass and enhances satiety during deficit."
+      min_fiber_per_1000kcal:
+        value: 16.0
+        unit: "g/1000kcal"
+        reason: "Dietary fiber increases gastric distension and prolongs postprandial fullness."
+    guidance:
+      - "Maintain a safe, moderate caloric deficit of 250 to 500 kcal/day (rate of 0.25-0.5 kg/week)."
+      - "Prioritize lean proteins and bulky, high-volume vegetables to maintain satisfaction."
+      - "Avoid liquid calories (sugar-sweetened beverages, commercial fruit juices, alcohol)."
+
+restrictions:
+  low_sodium:
+    max_sodium_mg: 1500.0
+    reason: "Low-sodium dietary preference constraint."
+  low_sugar:
+    max_sugar_pct_kcal: 5.0
+    reason: "Low-sugar dietary preference constraint."

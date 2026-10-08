@@ -1,0 +1,139 @@
+{
+  "candidate_cv_benchmarks": {
+    "LogisticRegression": {
+      "cv_accuracy_mean": 0.6713,
+      "cv_accuracy_std": 0.0159,
+      "cv_macro_f1_mean": 0.5692,
+      "cv_macro_f1_std": 0.024
+    },
+    "RandomForest": {
+      "cv_accuracy_mean": 0.8304,
+      "cv_accuracy_std": 0.0216,
+      "cv_macro_f1_mean": 0.7672,
+      "cv_macro_f1_std": 0.0294
+    },
+    "LightGBM": {
+      "cv_accuracy_mean": 0.8672,
+      "cv_accuracy_std": 0.0254,
+      "cv_macro_f1_mean": 0.8247,
+      "cv_macro_f1_std": 0.0338
+    }
+  },
+  "synthetic_test_evaluation": {
+    "accuracy": 0.9313,
+    "macro_f1": 0.7041,
+    "brier_score": 0.1123,
+    "per_class_recall": {
+      "Underweight": 0.978,
+      "Healthy": 0.0,
+      "Overweight": 0.868,
+      "Obese": 0.951
+    },
+    "confusion_matrix": [
+      [
+        45,
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        2,
+        79,
+        10
+      ],
+      [
+        1,
+        1,
+        7,
+        174
+      ]
+    ]
+  },
+  "likely_original_holdout_evaluation": {
+    "accuracy": 0.6179,
+    "macro_f1": 0.4731,
+    "brier_score": 0.5307,
+    "per_class_recall": {
+      "Underweight": 0.412,
+      "Healthy": 0.823,
+      "Overweight": 0.439,
+      "Obese": 0.129
+    },
+    "confusion_matrix": [
+      [
+        7,
+        9,
+        0,
+        1
+      ],
+      [
+        5,
+        116,
+        19,
+        1
+      ],
+      [
+        0,
+        31,
+        25,
+        1
+      ],
+      [
+        0,
+        22,
+        5,
+        4
+      ]
+    ]
+  },
+  "fairness_audit_on_real_holdout": {
+    "by_gender": {
+      "Male": {
+        "count": 131,
+        "accuracy": 0.5954,
+        "macro_f1": 0.4636
+      },
+      "Female": {
+        "count": 115,
+        "accuracy": 0.6435,
+        "macro_f1": 0.4928
+      }
+    },
+    "by_age_band": {
+      "< 25": {
+        "count": 182,
+        "accuracy": 0.6703,
+        "macro_f1": 0.4712
+      },
+      "25 - 40": {
+        "count": 56,
+        "accuracy": 0.4643,
+        "macro_f1": 0.317
+      },
+      "> 40": {
+        "count": 8,
+        "accuracy": 0.5,
+        "macro_f1": 0.3889
+      }
+    }
+  },
+  "training_metadata": {
+    "n_train_samples": 1521,
+    "n_synthetic_test_samples": 320,
+    "n_real_holdout_samples": 246,
+    "seed": 42,
+    "classes": [
+      "Underweight",
+      "Healthy",
+      "Overweight",
+      "Obese"
+    ]
+  }
+}

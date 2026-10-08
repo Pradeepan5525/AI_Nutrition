@@ -1,0 +1,110 @@
+{
+  "baseline_sample_size": 2111,
+  "production_sample_size": 400,
+  "feature_drift": {
+    "Age": {
+      "type": "numeric",
+      "psi": 0.2106,
+      "ks_statistic": 0.1361,
+      "ks_pvalue": 0.0,
+      "status": "MODERATE_DRIFT"
+    },
+    "FCVC": {
+      "type": "numeric",
+      "psi": 0.0213,
+      "ks_statistic": 0.0432,
+      "ks_pvalue": 0.5393,
+      "status": "STABLE"
+    },
+    "NCP": {
+      "type": "numeric",
+      "psi": 0.0092,
+      "ks_statistic": 0.024,
+      "ks_pvalue": 0.9875,
+      "status": "STABLE"
+    },
+    "CH2O": {
+      "type": "numeric",
+      "psi": 0.0228,
+      "ks_statistic": 0.0484,
+      "ks_pvalue": 0.3952,
+      "status": "STABLE"
+    },
+    "FAF": {
+      "type": "numeric",
+      "psi": 0.017,
+      "ks_statistic": 0.0297,
+      "ks_pvalue": 0.9175,
+      "status": "STABLE"
+    },
+    "TUE": {
+      "type": "numeric",
+      "psi": 0.025,
+      "ks_statistic": 0.0528,
+      "ks_pvalue": 0.2938,
+      "status": "STABLE"
+    },
+    "Gender": {
+      "type": "categorical",
+      "psi": 0.0001,
+      "status": "STABLE"
+    },
+    "family_history_with_overweight": {
+      "type": "categorical",
+      "psi": 0.0,
+      "status": "STABLE"
+    },
+    "FAVC": {
+      "type": "categorical",
+      "psi": 0.0008,
+      "status": "STABLE"
+    },
+    "CAEC": {
+      "type": "categorical",
+      "psi": 0.0102,
+      "status": "STABLE"
+    },
+    "SMOKE": {
+      "type": "categorical",
+      "psi": 0.0043,
+      "status": "STABLE"
+    },
+    "SCC": {
+      "type": "categorical",
+      "psi": 0.0005,
+      "status": "STABLE"
+    },
+    "CALC": {
+      "type": "categorical",
+      "psi": 0.0045,
+      "status": "STABLE"
+    },
+    "MTRANS": {
+      "type": "categorical",
+      "psi": 0.0123,
+      "status": "STABLE"
+    }
+  },
+  "prediction_drift": {
+    "prediction_psi": 0.0024,
+    "baseline_class_distribution": {
+      "Obese": 0.448,
+      "Overweight": 0.269,
+      "Healthy": 0.157,
+      "Underweight": 0.126
+    },
+    "production_class_distribution": {
+      "Obese": 0.455,
+      "Overweight": 0.252,
+      "Healthy": 0.17,
+      "Underweight": 0.122
+    },
+    "status": "STABLE"
+  },
+  "summary": {
+    "total_features_evaluated": 14,
+    "features_with_moderate_drift": 1,
+    "features_with_severe_drift": 0,
+    "overall_system_status": "WARNING_MONITOR"
+  }
+}
