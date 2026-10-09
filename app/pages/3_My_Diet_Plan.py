@@ -7,6 +7,7 @@ import streamlit as st
 from app.ui_components import (
     init_session_state,
     inject_custom_css,
+    render_auth_sidebar,
     render_hero,
     render_medical_disclaimer,
 )
@@ -21,6 +22,7 @@ st.set_page_config(
 
 inject_custom_css()
 init_session_state()
+render_auth_sidebar()
 render_medical_disclaimer()
 
 render_hero(
@@ -236,10 +238,12 @@ if st.session_state.meal_plan_result is not None:
                                 )
                                 if swaps:
                                     for s in swaps:
-                                        st.markdown(f"**{s['name']}**")
+                                        st.markdown(f"**{s.get('name', 'Alternative Item')}**")
+                                        imp = s.get("score_improvement") or (s.get("swap_diff", {}).get("delta_health_score", 0.0))
+                                        k_diff = s.get("kcal_diff") or (s.get("swap_diff", {}).get("delta_kcal_100g", 0.0))
+                                        na_diff = s.get("sodium_diff_mg") or (s.get("swap_diff", {}).get("delta_sodium_mg_100g", 0.0))
                                         st.caption(
-                                            f"Score: +{s['score_improvement']:.1f} | "
-                                            f"Δ kcal: {s['kcal_diff']:+.0f} | Δ Na: {s['sodium_diff_mg']:+.0f}mg"
+                                            f"Score: +{imp:.1f} | Δ kcal: {k_diff:+.0f} | Δ Na: {na_diff:+.0f}mg"
                                         )
                                         st.markdown("---")
                                 else:

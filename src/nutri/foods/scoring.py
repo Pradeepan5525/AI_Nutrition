@@ -98,14 +98,24 @@ def calculate_health_score_v2(
 
 
 def explain_health_score(
-    kcal_100g: float,
-    protein_100g: float,
-    sat_fat_100g: float,
-    sugar_100g: float,
-    fiber_100g: float,
-    sodium_mg_100g: float,
+    kcal_100g: float | Dict[str, Any] = 0.0,
+    protein_100g: float = 0.0,
+    sat_fat_100g: float = 0.0,
+    sugar_100g: float = 0.0,
+    fiber_100g: float = 0.0,
+    sodium_mg_100g: float = 0.0,
 ) -> Dict[str, Any]:
     """Breakdown factors driving a food's health score for UI explanation."""
+    if isinstance(kcal_100g, dict):
+        food = kcal_100g
+        k = float(food.get("energy_kcal_100g", 0.0) or 0.0)
+        p = float(food.get("protein_100g", 0.0) or 0.0)
+        sf = float(food.get("sat_fat_100g", 0.0) or 0.0)
+        s = float(food.get("sugars_100g", 0.0) or 0.0)
+        f = float(food.get("fiber_100g", 0.0) or 0.0)
+        na = float(food.get("sodium_mg_100g", 0.0) or 0.0)
+        return explain_health_score(k, p, sf, s, f, na)
+
     positives = []
     negatives = []
 

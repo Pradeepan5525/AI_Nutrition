@@ -248,3 +248,55 @@ class VersionResponse(BaseModel):
     version: str
     model_architecture: str
     optimizer_engine: str
+
+
+# ---------------------------------------------------------------------------
+# Authentication & User Schemas
+# ---------------------------------------------------------------------------
+class UserRegisterRequest(BaseModel):
+    """Payload to register a new user account."""
+
+    username: str = Field(..., min_length=3, max_length=50, description="Unique username")
+    email: str = Field(..., description="Valid email address")
+    password: str = Field(..., min_length=6, max_length=128, description="Account password")
+    full_name: Optional[str] = Field(default=None, description="User full name")
+    role: Literal["patient", "clinician"] = Field(
+        default="patient", description="User role in the system"
+    )
+    initial_profile: Optional[Dict[str, Any]] = Field(
+        default=None, description="Optional initial metabolic/dietary profile"
+    )
+
+
+class UserLoginRequest(BaseModel):
+    """Payload for user authentication."""
+
+    username_or_email: str = Field(..., description="Username or email address")
+    password: str = Field(..., description="Plaintext account password")
+
+
+class UserResponse(BaseModel):
+    """Public user record details."""
+
+    id: int
+    username: str
+    email: str
+    full_name: Optional[str] = None
+    role: str
+    saved_profile: Optional[Dict[str, Any]] = None
+    created_at: str
+    last_login: Optional[str] = None
+
+
+class TokenResponse(BaseModel):
+    """JWT Bearer access token response."""
+
+    access_token: str
+    token_type: str = "bearer"
+    user: UserResponse
+
+
+class UserProfileUpdateRequest(BaseModel):
+    """Payload for updating saved anthropometric & dietary profile."""
+
+    profile: Dict[str, Any] = Field(..., description="Key-value mapping of saved user parameters")

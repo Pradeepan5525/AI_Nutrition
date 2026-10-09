@@ -362,6 +362,12 @@ docker compose down
 | :--- | :--- | :--- |
 | `GET` | `/health` | Service health status, database check, and UTC timestamp. |
 | `GET` | `/version` | System build version, model commit hash, and component info. |
+| `POST` | `/api/v1/auth/register` | Register new patient or clinician account with salted password. |
+| `POST` | `/api/v1/auth/login` | Authenticate user via JSON body and receive signed JWT token. |
+| `POST` | `/api/v1/auth/token` | Standard OAuth2 Password Form login (for Swagger UI Authorize). |
+| `GET` | `/api/v1/auth/me` | Fetch authenticated user details and persisted metabolic profile. |
+| `PUT` | `/api/v1/auth/profile` | Update and sync saved health profile to user account. |
+| `GET` | `/api/v1/auth/users` | List all system users (Clinicians / Admins only). |
 | `POST` | `/api/v1/assess` | Anthropometrics, BMR, TDEE, macro distribution, and safety gate. |
 | `POST` | `/api/v1/risk/predict` | Calibrated lifestyle risk classification with SHAP local explanations. |
 | `POST` | `/api/v1/plan/generate` | Single-day or 7-day PuLP MILP meal plan with grocery list. |
@@ -369,7 +375,39 @@ docker compose down
 | `POST` | `/api/v1/foods/swaps` | Find same-category healthier swaps for a target food. |
 | `POST` | `/api/v1/reports/pdf` | Generate publication-grade 2-page PDF assessment & meal plan report. |
 
+### 🔑 Pre-Seeded Evaluation Credentials
+| Username | Password | Role | Description |
+| :--- | :--- | :--- | :--- |
+| `demo_user` | `demo123` | `patient` | Pre-configured patient with saved hypertension profile. |
+| `clinician_demo` | `admin123` | `clinician` | Certified clinician account with access to user management. |
+
 ### Sample Requests & Responses
+
+#### 0. User Login (`POST /api/v1/auth/login`)
+```bash
+curl -X POST "http://localhost:8000/api/v1/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username_or_email": "demo_user",
+    "password": "demo123"
+  }'
+```
+**Response (200 OK):**
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer",
+  "user": {
+    "id": 1,
+    "username": "demo_user",
+    "email": "patient@example.com",
+    "full_name": "Alex Carter (Patient)",
+    "role": "patient",
+    "saved_profile": {"weight_kg": 76.5, "height_cm": 178.0, "goal": "lose_weight"}
+  }
+}
+```
+
 
 #### 1. Anthropometric Assessment (`POST /api/v1/assess`)
 ```bash

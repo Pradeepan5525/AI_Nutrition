@@ -119,6 +119,14 @@ def find_healthier_swaps(
             highlights.append(f"+{delta_fiber:.1f}g fiber")
 
         cand_annotated = dict(cand)
+        cand_annotated["score_improvement"] = delta_score
+        cand_annotated["kcal_diff"] = delta_kcal
+        cand_annotated["sodium_diff_mg"] = delta_sodium
+        cand_annotated["sugar_diff_g"] = delta_sugar
+        cand_annotated["sat_fat_diff_g"] = round(
+            float(cand.get("sat_fat_100g", 0.0)) - float(base_food.get("sat_fat_100g", 0.0)), 1
+        )
+        cand_annotated["reasons"] = highlights
         cand_annotated["swap_diff"] = {
             "delta_health_score": delta_score,
             "delta_kcal_100g": delta_kcal,

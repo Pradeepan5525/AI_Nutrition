@@ -10,6 +10,7 @@ import streamlit as st
 from app.ui_components import (
     init_session_state,
     inject_custom_css,
+    render_auth_sidebar,
     render_hero,
     render_medical_disclaimer,
 )
@@ -23,6 +24,7 @@ st.set_page_config(
 
 inject_custom_css()
 init_session_state()
+render_auth_sidebar()
 render_medical_disclaimer()
 
 render_hero(

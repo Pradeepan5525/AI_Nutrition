@@ -162,7 +162,12 @@ def render_hero(title: str, subtitle: str) -> None:
 
 
 def init_session_state() -> None:
-    """Ensure session state default profile parameters exist across page transitions."""
+    """Ensure session state default profile and auth parameters exist across page transitions."""
+    if "auth_user" not in st.session_state:
+        st.session_state.auth_user = None
+    if "auth_token" not in st.session_state:
+        st.session_state.auth_token = None
+
     if "user_profile" not in st.session_state:
         st.session_state.user_profile = {
             "age": 28,
@@ -182,3 +187,144 @@ def init_session_state() -> None:
         st.session_state.risk_result = None
     if "meal_plan_result" not in st.session_state:
         st.session_state.meal_plan_result = None
+
+
+def render_auth_sidebar() -> None:
+    """Render the user authentication module in the Streamlit sidebar."""
+    from nutri.auth.security import create_access_token
+    from nutri.auth.user_db import get_user_db
+
+    db = get_user_db()
+
+    st.sidebar.markdown("### 🔐 User Portal")
+
+    # 1. Logged in state
+    if st.session_state.auth_user:
+        user = st.session_state.auth_user
+        role = user.get("role", "patient")
+        role_label = "🩺 Clinician / Dietitian" if role == "clinician" else "👤 Patient"
+
+        st.sidebar.markdown(
+            f"""
+            <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px; margin-bottom:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                    <strong style="color:#0f172a; font-size:0.95rem;">{user.get("full_name") or user.get("username")}</strong>
+                </div>
+                <div style="font-size:0.75rem; color:#64748b; margin-bottom:8px;">@{user.get("username")} • {user.get("email")}</div>
+                <div style="display:inline-block; font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:12px; {"background:#ccfbf1; color:#0f766e;" if role == "clinician" else "background:#dbeafe; color:#1d4ed8;"}">
+                    {role_label}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        c_save, c_out = st.sidebar.columns([1.2, 1])
+        with c_save:
+            if st.button(
+                "💾 Sync Profile",
+                key="btn_sync_profile",
+                help="Save current health stats to your account",
+            ):
+                updated = db.update_user_profile(user["id"], st.session_state.user_profile)
+                if updated:
+                    st.session_state.auth_user = updated
+                    st.sidebar.success("Profile saved!")
+        with c_out:
+            if st.button("🚪 Log Out", key="btn_logout"):
+                st.session_state.auth_user = None
+                st.session_state.auth_token = None
+                st.rerun()
+
+        st.sidebar.divider()
+        return
+
+    # 2. Not logged in state
+    with st.sidebar.expander("🔑 Login / Account Access", expanded=True):
+        tab_login, tab_demo, tab_reg = st.tabs(["Sign In", "Demo", "Register"])
+
+        with tab_login:
+            login_id = st.text_input("Username or Email", key="auth_login_user")
+            login_pwd = st.text_input("Password", type="password", key="auth_login_pwd")
+            if st.button("Sign In", key="btn_auth_signin", use_container_width=True):
+                if not login_id or not login_pwd:
+                    st.error("Please enter your username and password.")
+                else:
+                    auth_res = db.authenticate_user(login_id, login_pwd)
+                    if auth_res:
+                        token = create_access_token(
+                            {
+                                "sub": auth_res["username"],
+                                "user_id": auth_res["id"],
+                                "role": auth_res["role"],
+                            }
+                        )
+                        st.session_state.auth_user = auth_res
+                        st.session_state.auth_token = token
+                        # If user has a saved profile, load it
+                        if auth_res.get("saved_profile"):
+                            st.session_state.user_profile.update(auth_res["saved_profile"])
+                        st.success(
+                            f"Welcome back, {auth_res.get('full_name') or auth_res['username']}!"
+                        )
+                        st.rerun()
+                    else:
+                        st.error("Invalid credentials.")
+
+        with tab_demo:
+            st.caption("1-Click Instant Login for Evaluation:")
+            if st.button("👤 Demo Patient", key="btn_demo_patient", use_container_width=True):
+                demo = db.get_user_by_username("demo_user")
+                if demo:
+                    st.session_state.auth_user = demo
+                    st.session_state.auth_token = create_access_token(
+                        {"sub": demo["username"], "user_id": demo["id"], "role": demo["role"]}
+                    )
+                    if demo.get("saved_profile"):
+                        st.session_state.user_profile.update(demo["saved_profile"])
+                    st.success("Signed in as Demo Patient!")
+                    st.rerun()
+
+            if st.button("🩺 Demo Clinician", key="btn_demo_clinician", use_container_width=True):
+                demo = db.get_user_by_username("clinician_demo")
+                if demo:
+                    st.session_state.auth_user = demo
+                    st.session_state.auth_token = create_access_token(
+                        {"sub": demo["username"], "user_id": demo["id"], "role": demo["role"]}
+                    )
+                    st.success("Signed in as Demo Clinician!")
+                    st.rerun()
+
+        with tab_reg:
+            reg_user = st.text_input("Username", key="auth_reg_user")
+            reg_email = st.text_input("Email", key="auth_reg_email")
+            reg_name = st.text_input("Full Name", key="auth_reg_name")
+            reg_pwd = st.text_input("New Password", type="password", key="auth_reg_pwd")
+            reg_role = st.selectbox("Role", ["patient", "clinician"], key="auth_reg_role")
+
+            if st.button("Create Account", key="btn_auth_register", use_container_width=True):
+                if not reg_user or not reg_email or not reg_pwd:
+                    st.error("Username, email, and password are required.")
+                elif len(reg_pwd) < 6:
+                    st.error("Password must be at least 6 characters.")
+                elif db.get_user_by_username(reg_user):
+                    st.error(f"Username '{reg_user}' is already taken.")
+                elif db.get_user_by_email(reg_email):
+                    st.error(f"Email '{reg_email}' is already registered.")
+                else:
+                    new_u = db.create_user(
+                        username=reg_user,
+                        email=reg_email,
+                        password=reg_pwd,
+                        full_name=reg_name,
+                        role=reg_role,
+                        initial_profile=st.session_state.user_profile,
+                    )
+                    st.session_state.auth_user = new_u
+                    st.session_state.auth_token = create_access_token(
+                        {"sub": new_u["username"], "user_id": new_u["id"], "role": new_u["role"]}
+                    )
+                    st.success("Account created successfully! Welcome aboard.")
+                    st.rerun()
+
+    st.sidebar.divider()

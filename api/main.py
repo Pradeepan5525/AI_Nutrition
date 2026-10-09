@@ -21,7 +21,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
-from api.routers import assess, foods, plan, reports, risk
+from api.routers import assess, auth, foods, plan, reports, risk
 from api.schemas import HealthResponse, VersionResponse
 from nutri.config import MODEL_PATH
 from nutri.foods.food_db import get_food_db
@@ -42,6 +42,7 @@ A production-grade clinical nutrition intelligence backend combining:
 4. **Transparent Food Scoring & Swaps**: Health Score v2 (0-100) and strictly healthier same-category alternatives.
 5. **Linear Programming Meal Optimization**: PuLP MILP solver generating caloric-exact (±5%) meal plans with tri-state allergen safety.
 6. **Downloadable Clinical Reports**: Publication-grade PDF exports via ReportLab.
+7. **Secure Authentication & User Management**: PBKDF2 salted passwords, JWT Bearer tokens, and clinical role permissions.
 
 **Notice**: This system is designed for educational and informational purposes only. It is not medical advice.
 """
@@ -87,6 +88,7 @@ async def log_request_timing(request: Request, call_next: Callable) -> Response:
 
 
 # Include modular routers
+app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
 app.include_router(assess.router)
 app.include_router(risk.router)
 app.include_router(plan.router)
