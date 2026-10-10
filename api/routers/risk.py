@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from api.deps import get_current_user
 from api.schemas import RiskRequest, RiskResponse
 from nutri.models.predict import predict_obesity_risk
 
@@ -11,7 +12,10 @@ router = APIRouter(prefix="/risk", tags=["Risk Screening"])
 
 
 @router.post("", response_model=RiskResponse)
-def screen_lifestyle_risk(payload: RiskRequest) -> RiskResponse:
+def screen_lifestyle_risk(
+    payload: RiskRequest,
+    current_user: dict = Depends(get_current_user),
+) -> RiskResponse:
     """Predict lifestyle obesity risk tier, calibrated probabilities, and SHAP drivers.
 
     Note: Anthropometric measurements (Height, Weight, BMI) are strictly excluded

@@ -21,9 +21,10 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
-from api.routers import assess, auth, foods, plan, reports, risk
+from api.routers import assess, auth, foods, plan, reports, risk, users
 from api.schemas import HealthResponse, VersionResponse
 from nutri.config import MODEL_PATH
+from nutri.database.engine import init_db
 from nutri.foods.food_db import get_food_db
 from nutri.logging import setup_logger
 
@@ -42,7 +43,7 @@ A production-grade clinical nutrition intelligence backend combining:
 4. **Transparent Food Scoring & Swaps**: Health Score v2 (0-100) and strictly healthier same-category alternatives.
 5. **Linear Programming Meal Optimization**: PuLP MILP solver generating caloric-exact (±5%) meal plans with tri-state allergen safety.
 6. **Downloadable Clinical Reports**: Publication-grade PDF exports via ReportLab.
-7. **Secure Authentication & User Management**: PBKDF2 salted passwords, JWT Bearer tokens, and clinical role permissions.
+7. **Secure Authentication & User Management**: Argon2 password hashing, JWT Bearer tokens, httpOnly refresh cookies, and clinical role permissions.
 
 **Notice**: This system is designed for educational and informational purposes only. It is not medical advice.
 """
@@ -59,14 +60,27 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# CORS Middleware
+# CORS Middleware allowing Vite dev server and credentials
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:8000",
+    ],
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.on_event("startup")
+def on_startup():
+    """Ensure database schema is initialized on startup."""
+    init_db()
 
 
 @app.middleware("http")
@@ -87,8 +101,11 @@ async def log_request_timing(request: Request, call_next: Callable) -> Response:
     return response
 
 
-# Include modular routers
+# Include modular routers (both /auth and /api/v1/auth for compatibility)
+app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
+app.include_router(users.router)
+app.include_router(users.router, prefix="/api/v1")
 app.include_router(assess.router)
 app.include_router(risk.router)
 app.include_router(plan.router)

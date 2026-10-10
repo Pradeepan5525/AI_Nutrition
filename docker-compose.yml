@@ -12,6 +12,8 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - PYTHONPATH=/app:/app/src
+      - DATABASE_URL=sqlite:////app/data/processed/nutrition_app.db
+      - SECRET_KEY=demo_dev_secret_key_nutrition_intelligence_system_change_in_production
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 15s
@@ -20,17 +22,13 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  app:
+  web:
     build:
-      context: .
+      context: ./web
       dockerfile: Dockerfile
-    container_name: nutrition-intelligence-ui
-    command: streamlit run app/Home.py --server.port 8501 --server.address 0.0.0.0 --server.headless true
+    container_name: nutrition-intelligence-web
     ports:
-      - "8501:8501"
-    environment:
-      - PYTHONUNBUFFERED=1
-      - PYTHONPATH=/app:/app/src
+      - "5173:80"
     depends_on:
       api:
         condition: service_healthy

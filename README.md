@@ -532,20 +532,87 @@ curl -X POST "http://localhost:8000/api/v1/plan/generate" \
 
 ---
 
-## 🖥️ Streamlit Multi-Page Interface Tour
+## 🖥️ Modern Single-Theme Frontend (React + Vite + TypeScript)
 
-The Streamlit UI provides a rich, responsive interface with customized Plotly visualizations, styled metric tiles, and accessibility features.
+The application features a modern, responsive Single-Page Application (SPA) built with **React 18, Vite, TypeScript, Tailwind CSS, TanStack Query, and Recharts**. It strictly enforces a **Login-First Security Gate** and a **Calm Clinical 12-Token Design System** (single emerald green accent on neutral gray and white cards, with dark gradient panels).
 
-- **`Home.py` (Executive Overview):** Project overview, interactive workflow diagram, rapid persona loader (Pre-diabetic Professional, Hypertensive Senior, Lean Muscle Builder), and primary disclaimers.
-- **`1_My_Health.py` (Anthropometrics & Metabolic Goals):** Interactive sliders for age, weight, and height. Dynamic WHO vs. Asian BMI gauge charts, Mifflin-St Jeor TDEE breakdowns, clinical constraint badges, and safety gate referral alerts.
-- **`2_Risk_Check.py` (Lifestyle Risk Assessment):** Behavioral lifestyle inputs (meals, water, activity, screen time). Interactive Plotly probability distribution bars and dynamic SHAP waterfall attribution plots explaining individual lifestyle risk factors.
-- **`3_My_Diet_Plan.py` (PuLP Meal Planner & Grocery Hub):** 1-day or 7-day meal plan generator with macro donut breakdowns, nutrient progress bars, in-line healthier swap suggestions, department-grouped grocery checklists, and a 1-click **Download Clinical PDF Report** button.
-- **`4_Food_Explorer.py` (Food Catalog & Health Score v2):** Search across 32,847 items with allergen filters, nutrient radar charts, micronutrient distribution tables, and automated healthier swap recommendations.
-- **`5_About.py` (Engineering & Methodology):** Interactive viewers for Dataset Cards, Model Cards, Codified Clinical Rules, and real-time Data Drift Telemetry.
+All UI routes and responsive viewports have been visually captured and tested in `reports/ui_screenshots/`:
+
+| Page | Description | Responsive Screenshots |
+|---|---|---|
+| **Login** | Split-panel login with password toggle, "Remember me", and clinical intelligence features. | [1440px](reports/ui_screenshots/login_1440px.png) \| [390px](reports/ui_screenshots/login_390px.png) |
+| **Register** | Account creation with password strength meter and mandatory educational disclaimer checkbox. | [1440px](reports/ui_screenshots/register_1440px.png) \| [390px](reports/ui_screenshots/register_390px.png) |
+| **Onboarding** | 3-step wizard (Anthropometrics, Lifestyle & Goals, Clinical Context & Allergens). | Pre-fills all tools across the app. |
+| **Dashboard** | Personalized welcome, "Today's Targets" dark gradient card, active alerts, and 6 module cards. | [1440px](reports/ui_screenshots/dashboard_1440px.png) \| [390px](reports/ui_screenshots/dashboard_390px.png) |
+| **Health Check** | Preset scenarios, WHO/Asian BMI gauge, Mifflin-St Jeor BMR/TDEE, and macro distribution. | [1440px](reports/ui_screenshots/health_check_1440px.png) \| [390px](reports/ui_screenshots/health_check_390px.png) |
+| **Risk Predictor** | Calibrated LightGBM lifestyle screening with SHAP factor drivers (amber raises, green lowers). | [1440px](reports/ui_screenshots/risk_predictor_1440px.png) \| [390px](reports/ui_screenshots/risk_predictor_390px.png) |
+| **Diet Planner** | Daily & 7-Day MILP meal plans, item swaps, rule explanation panel, and PDF export. | [1440px](reports/ui_screenshots/diet_planner_1440px.png) \| [390px](reports/ui_screenshots/diet_planner_390px.png) |
+| **Food Explorer** | Catalog search across 32k+ items, tri-state allergen status, and 3-way food comparison. | [1440px](reports/ui_screenshots/food_explorer_1440px.png) \| [390px](reports/ui_screenshots/food_explorer_390px.png) |
+| **Condition Advisor** | Codified AHA DASH, ADA, and ACC clinical guidelines with auditable evidence citations. | [1440px](reports/ui_screenshots/condition_advisor_1440px.png) \| [390px](reports/ui_screenshots/condition_advisor_390px.png) |
+| **Progress & Alerts**| Weight telemetry chart in emerald green, goal setting, active/triggered alerts, notifications. | [1440px](reports/ui_screenshots/progress_alerts_1440px.png) \| [390px](reports/ui_screenshots/progress_alerts_390px.png) |
+| **History** | Searchable audit table of saved assessments, risk screenings, and plans with deletion. | [1440px](reports/ui_screenshots/history_1440px.png) \| [390px](reports/ui_screenshots/history_390px.png) |
+| **Profile** | User profile editing, password management, GDPR Data Export, and Account Erasure modal. | [1440px](reports/ui_screenshots/profile_1440px.png) \| [390px](reports/ui_screenshots/profile_390px.png) |
+
+*(Note: The legacy Streamlit UI has been moved to `legacy/streamlit_app/` for historical reference).*
 
 ---
 
-## 📈 Drift Monitoring & Telemetry
+## 🔒 Privacy, Security & Data Governance
+
+1. **Login-First Gate:** Unauthenticated visitors cannot access any clinical tools or data. All URLs redirect to `/login`.
+2. **In-Memory Token + httpOnly Cookie:** JWT access tokens (15-30 min) reside strictly in client memory. Refresh tokens (7-30 days) use `httpOnly`, `SameSite=lax` cookies with automatic rotation on use.
+3. **Data Portability:** `GET /users/me/export` provides a complete, one-click JSON archive of all personal assessments, risk screenings, meal plans, and weight logs.
+4. **Account Erasure:** `DELETE /users/me` permanently deletes the user account and cascades deletion across all related records in compliance with GDPR Right to Erasure.
+5. **No Hardcoded Credentials:** In development, create demo credentials using environment variables:
+   ```bash
+   $env:DEMO_USER_EMAIL = "patient@example.com"
+   $env:DEMO_USER_PASSWORD = "YourSecurePassword123!"
+   $env:DEMO_USER_NAME = "Alex Carter"
+   python scripts/create_demo_user.py
+   ```
+
+---
+
+## 🚀 Quickstart & Execution Commands
+
+### Prerequisites
+- Python 3.12+
+- Node.js 20+
+- (Optional) Docker & Docker Compose
+
+### 1. Setup & Installation
+```bash
+# Setup Python dependencies and Node modules
+make setup
+```
+
+### 2. Run Local Development
+```bash
+# In terminal 1: Start FastAPI backend (port 8000)
+make api
+
+# In terminal 2: Start React Vite frontend (port 5173)
+make web
+```
+Visit `http://localhost:5173` to access the application.
+
+### 3. Containerized Deployment (Docker Compose)
+```bash
+docker-compose up --build
+```
+Runs both `api` (port 8000) and `web` (port 5173 reverse proxied via Nginx).
+
+### 4. Automated Testing & Verification
+```bash
+# Backend unit & integration test suite with coverage
+make test
+
+# Automated Playwright end-to-end tests (20/20 checks & screenshot generation)
+make e2e
+
+# Strict 12-token design system color assertion
+make check-colors
+```
 
 To ensure algorithmic integrity against population and seasonal distribution changes, the system includes a dedicated drift detection pipeline:
 ```bash

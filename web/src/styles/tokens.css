@@ -1,0 +1,17 @@
+:root {
+  --bg: #F6F8FA;
+  --surface: #FFFFFF;
+  --border: #E5E9EE;
+  --text: #0F172A;
+  --muted: #64748B;
+  --primary: #047857;
+  --primary-hover: #065F46;
+  --primary-soft: #ECFDF5;
+  --primary-accent: #10B981;
+  --hero-from: #064E3B;
+  --hero-to: #0B1F1A;
+  --warning: #B45309;
+  --warning-soft: #FEF3C7;
+  --danger: #B91C1C;
+  --danger-soft: #FEE2E2;
+}

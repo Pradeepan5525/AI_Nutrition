@@ -5,8 +5,9 @@ from __future__ import annotations
 import json
 from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 
+from api.deps import get_current_user
 from api.schemas import FoodItem, FoodSearchResponse, FoodSwapItem, FoodSwapResponse
 from nutri.foods.food_db import get_food_db
 from nutri.foods.swaps import find_healthier_swaps
@@ -65,6 +66,7 @@ def search_foods(
     strict_allergens: bool = Query(True, description="Strict tri-state allergen safety"),
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(20, ge=1, le=100, description="Page size limit"),
+    current_user: dict = Depends(get_current_user),
 ) -> FoodSearchResponse:
     """Search catalog foods with allergen screening, dietary tags, and pagination."""
     db = get_food_db()
@@ -102,11 +104,25 @@ def search_foods(
     )
 
 
+@router.get("/{food_id}", response_model=FoodItem)
+def get_food_by_id_endpoint(
+    food_id: str,
+    current_user: dict = Depends(get_current_user),
+) -> FoodItem:
+    """Retrieve full nutrient and allergen profile for a single food item."""
+    db = get_food_db()
+    food = db.get_food_by_id(food_id)
+    if not food:
+        raise HTTPException(status_code=404, detail=f"Food item '{food_id}' not found.")
+    return _row_to_food_item(food)
+
+
 @router.get("/{food_id}/swaps", response_model=FoodSwapResponse)
 def get_food_swaps(
     food_id: str,
     max_swaps: int = Query(5, ge=1, le=20, description="Maximum number of swap alternatives"),
     strict_allergens: bool = Query(True, description="Enforce strict tri-state allergen safety"),
+    current_user: dict = Depends(get_current_user),
 ) -> FoodSwapResponse:
     """Identify strictly healthier same-category alternatives for a given food."""
     db = get_food_db()

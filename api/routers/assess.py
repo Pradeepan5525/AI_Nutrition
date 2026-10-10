@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from api.deps import get_current_user
 from api.schemas import AssessRequest, AssessResponse
 from nutri.assess.bmi import calculate_bmi, calculate_ideal_weight_range, get_bmi_category
 from nutri.assess.energy import calculate_bmr, calculate_tdee
@@ -20,7 +21,10 @@ DISCLAIMER_TEXT = (
 
 
 @router.post("", response_model=AssessResponse)
-def assess_user_profile(payload: AssessRequest) -> AssessResponse:
+def assess_user_profile(
+    payload: AssessRequest,
+    current_user: dict = Depends(get_current_user),
+) -> AssessResponse:
     """Perform comprehensive anthropometric, metabolic, and clinical safety assessment."""
     try:
         bmi = calculate_bmi(weight_kg=payload.weight_kg, height_cm=payload.height_cm)

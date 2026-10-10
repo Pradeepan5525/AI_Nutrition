@@ -3,8 +3,11 @@
 from fastapi.testclient import TestClient
 
 from api.main import app
+from nutri.auth.security import create_access_token
 
 client = TestClient(app)
+_token = create_access_token({"sub": "demo_user", "user_id": 1, "role": "patient"})
+client.headers.update({"Authorization": f"Bearer {_token}"})
 
 
 def test_health_endpoint():

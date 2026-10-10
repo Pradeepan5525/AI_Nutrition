@@ -38,3 +38,41 @@ This log documents all key architectural, algorithmic, and clinical engineering 
 - **Context:** Users with co-morbidities (e.g., Hypertension + Diabetes + Obesity) may receive conflicting nutritional guidelines.
 - **Decision:** Apply the **strictest bound** across all applicable clinical guidelines. For example, sodium is capped at 1500 mg (Hypertension/AHA) rather than 2300 mg (General/DGA). Every resulting constraint records the originating clinical guideline and citation in its explanation metadata.
 - **Rationale:** Safety first, with total auditable transparency to the user.
+
+## Decision 8: Login-First Security Gate & Zero Flash of Protected Routes
+- **Context:** The legacy app allowed unauthenticated visitors to view clinical calculators and patient data immediately.
+- **Decision:** Enforce a strict login gate. The only public routes are `/login` and `/register`. All tools, histories, and dashboards are protected behind `ProtectedRoute`. Visiting any URL while unauthenticated redirects to `/login` with target path preserved. While checking auth, a full-page skeleton renders, preventing any flash of protected content.
+- **Rationale:** Clinical ethics, HIPAA, and GDPR require authenticated isolation of patient health data.
+
+## Decision 9: Strict 12-Token Design System (One Green Accent)
+- **Context:** Prior UI had disparate colors, creating a cluttered and inconsistent experience.
+- **Decision:** Implement a calm, clinical theme with exactly 12 tokens:
+  - Page Background: `#F6F8FA`
+  - Surface: `#FFFFFF`
+  - Border: `#E5E9EE`
+  - Text: `#0F172A`
+  - Muted Text: `#64748B`
+  - Primary Accent: `#047857` (passes WCAG AA contrast against white)
+  - Primary Hover: `#065F46`
+  - Primary Soft: `#ECFDF5`
+  - Decorative Accent: `#10B981` (progress bars, chart lines)
+  - Hero Panels: Dark gradient from `#064E3B` to `#0B1F1A`
+  - Status Warning: `#B45309` / Soft `#FEF3C7`
+  - Status Danger: `#B91C1C` / Soft `#FEE2E2`
+  Enforced via `scripts/check_colors.py` with zero tolerance for external hex colors.
+- **Rationale:** Promotes user trust, clinical clarity, and visual elegance.
+
+## Decision 10: In-Memory Access Token with httpOnly Refresh Token Rotation
+- **Context:** Storing JWT access tokens in localStorage exposes users to XSS token theft.
+- **Decision:** Hold short-lived JWT access tokens (15–30 min) strictly in client memory. Refresh tokens (7–30 days) are transmitted solely via httpOnly, SameSite cookies. Each refresh request rotates the token, revoking previous refresh tokens immediately.
+- **Rationale:** High-security defense against XSS credential exfiltration, compliant with OWASP session management best practices.
+
+## Decision 11: Single-Page Application (React + Vite + TypeScript) Replacing Streamlit
+- **Context:** Streamlit re-executes the entire Python script on every user interaction, making complex client-side workflows, responsive mobile menus, drawer transitions, and fine-grained state management unwieldy.
+- **Decision:** Replaced Streamlit with a modern React 18 + Vite + TypeScript + Tailwind CSS application in `web/`. Archived Streamlit in `legacy/streamlit_app/`.
+- **Rationale:** Provides snappy client-side navigation, seamless onboarding wizards, interactive drawers, responsive layouts, and production-grade accessibility.
+
+## Decision 12: GDPR/HIPAA Data Portability and Cascading Erasure
+- **Context:** Clinical and dietary data must respect patient autonomy and privacy regulations.
+- **Decision:** Added `GET /users/me/export` providing a structured JSON download of anthropometric profiles, assessment logs, risk screenings, meal plans, and weight logs. Added `DELETE /users/me` with a confirmation modal that executes cascading database deletion of all user records.
+- **Rationale:** Full compliance with GDPR Article 17 (Right to Erasure) and Article 20 (Right to Data Portability).

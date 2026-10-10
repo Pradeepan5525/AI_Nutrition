@@ -57,3 +57,20 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Environment Variables
+.env
+.env.*
+!.env.example
+
+# Node / Frontend
+node_modules/
+web/node_modules/
+web/dist/
+dist/
+.eslintcache
+
+# Local SQLite databases (except static seed datasets)
+data/processed/nutrition_app.db
+*.sqlite3
+*.db-journal

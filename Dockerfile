@@ -27,7 +27,6 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy application source code and artifacts
 COPY src/ ./src/
 COPY api/ ./api/
-COPY app/ ./app/
 COPY artifacts/ ./artifacts/
 COPY data/processed/ ./data/processed/
 COPY data/raw/ ./data/raw/
@@ -35,8 +34,8 @@ COPY docs/ ./docs/
 COPY reports/ ./reports/
 COPY Makefile ./
 
-# Expose API (8000) and Streamlit UI (8501) ports
-EXPOSE 8000 8501
+# Expose API (8000) port
+EXPOSE 8000
 
 # Default execution starts FastAPI backend
 CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]

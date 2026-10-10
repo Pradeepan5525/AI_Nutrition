@@ -3,6 +3,7 @@ pandas>=2.2.0
 numpy>=1.26.0
 pyarrow>=15.0.0
 SQLAlchemy>=2.0.0
+alembic>=1.13.0
 PyYAML>=6.0
 
 # Machine Learning & Optimization
@@ -21,6 +22,7 @@ httpx>=0.27.0
 pyjwt>=2.8.0
 passlib>=1.7.4
 bcrypt>=4.0.0
+argon2-cffi>=23.1.0
 
 # Frontend & Visualization
 streamlit>=1.32.0

@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import io
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 
+from api.deps import get_current_user
 from api.schemas import ReportRequest
 from nutri.reports.pdf import generate_nutrition_pdf
 
@@ -14,7 +15,10 @@ router = APIRouter(prefix="/report", tags=["Reports"])
 
 
 @router.post("", response_class=StreamingResponse)
-def generate_pdf_report(payload: ReportRequest) -> StreamingResponse:
+def generate_pdf_report(
+    payload: ReportRequest,
+    current_user: dict = Depends(get_current_user),
+) -> StreamingResponse:
     """Generate and stream a publication-grade 2-page clinical nutrition PDF report."""
     try:
         report_data = payload.model_dump()

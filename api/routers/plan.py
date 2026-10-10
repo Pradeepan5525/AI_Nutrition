@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from api.deps import get_current_user
 from api.schemas import PlanRequest, PlanResponse
 from nutri.plan.grocery import aggregate_grocery_list
 from nutri.plan.optimizer import generate_meal_plan
@@ -17,7 +18,10 @@ PLAN_DISCLAIMER = (
 
 
 @router.post("", response_model=PlanResponse)
-def optimize_meal_plan(payload: PlanRequest) -> PlanResponse:
+def optimize_meal_plan(
+    payload: PlanRequest,
+    current_user: dict = Depends(get_current_user),
+) -> PlanResponse:
     """Solve mixed-integer linear program to generate personalized daily or 7-day meal plans."""
     try:
         plan_result = generate_meal_plan(

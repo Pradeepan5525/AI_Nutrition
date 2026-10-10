@@ -300,3 +300,158 @@ class UserProfileUpdateRequest(BaseModel):
     """Payload for updating saved anthropometric & dietary profile."""
 
     profile: Dict[str, Any] = Field(..., description="Key-value mapping of saved user parameters")
+
+
+class RegisterRequest(BaseModel):
+    """Payload to register a new user account with educational disclaimer."""
+
+    email: str = Field(..., description="Valid email address")
+    password: str = Field(..., min_length=8, max_length=128, description="Account password (min 8 chars, letters+digits)")
+    full_name: Optional[str] = Field(default=None, description="User full name")
+    username: Optional[str] = Field(default=None, description="Optional username (defaults to email)")
+    accept_disclaimer: bool = Field(default=False, description="Must acknowledge educational disclaimer")
+
+
+class LoginRequest(BaseModel):
+    """Payload for user authentication with remember-me support."""
+
+    username_or_email: Optional[str] = Field(default=None, description="Username or email address")
+    email: Optional[str] = Field(default=None, description="Email address")
+    password: str = Field(..., description="Plaintext account password")
+    remember_me: bool = Field(default=False, description="Extend session lifetime to 30 days")
+
+
+class ProfileDetail(BaseModel):
+    """Structured user clinical & anthropometric profile."""
+
+    age: Optional[int] = None
+    sex: Optional[str] = None
+    height_cm: Optional[float] = None
+    weight_kg: Optional[float] = None
+    activity_level: Optional[str] = None
+    goal: Optional[str] = None
+    is_asian: bool = False
+    conditions: List[str] = Field(default_factory=list)
+    allergies: List[str] = Field(default_factory=list)
+    dietary_restrictions: List[str] = Field(default_factory=list)
+    preferred_cuisine: str = "Any"
+    onboarding_completed: bool = False
+    updated_at: Optional[str] = None
+
+
+class UserFullResponse(BaseModel):
+    """Complete user representation including structured profile."""
+
+    id: int
+    username: str
+    email: str
+    full_name: Optional[str] = None
+    role: str
+    profile: Optional[ProfileDetail] = None
+    saved_profile: Optional[Dict[str, Any]] = None
+    created_at: str
+    last_login: Optional[str] = None
+
+
+class PasswordChangeRequest(BaseModel):
+    """Payload for changing account password."""
+
+    current_password: str = Field(..., description="Current password")
+    new_password: str = Field(..., min_length=8, description="New password")
+
+
+class WeightLogItem(BaseModel):
+    """Body weight tracking entry."""
+
+    id: Optional[int] = None
+    weight_kg: float
+    bmi: Optional[float] = None
+    note: Optional[str] = None
+    logged_at: Optional[str] = None
+
+
+class GoalAlertItem(BaseModel):
+    """Personalized goal and alert parameters."""
+
+    id: Optional[int] = None
+    target_weight_kg: Optional[float] = None
+    daily_calorie_cap: Optional[float] = None
+    sodium_cap_mg: Optional[float] = None
+    hydration_target_ml: Optional[float] = None
+    alert_type: Optional[str] = None
+    status: str = "active"
+    message: Optional[str] = None
+    last_evaluated: Optional[str] = None
+
+
+class NotificationItem(BaseModel):
+    """In-app alert notification."""
+
+    id: Optional[int] = None
+    title: str
+    message: str
+    is_read: bool = False
+    notification_type: str = "info"
+    created_at: Optional[str] = None
+
+
+class AssessmentRecord(BaseModel):
+    """Persisted user assessment record."""
+
+    id: Optional[int] = None
+    created_at: Optional[str] = None
+    input_data: Dict[str, Any]
+    bmi: float
+    bmi_category: str
+    bmr_kcal: float
+    tdee_kcal: float
+    target_kcal: float
+    protein_g: float
+    carbs_g: float
+    fat_g: float
+    sodium_mg: float
+    water_ml: float
+    safety_cleared: bool = True
+    safety_flags: List[str] = Field(default_factory=list)
+    clinical_constraints: Dict[str, Any] = Field(default_factory=dict)
+
+
+class RiskRecord(BaseModel):
+    """Persisted obesity lifestyle risk screening record."""
+
+    id: Optional[int] = None
+    created_at: Optional[str] = None
+    input_habits: Dict[str, Any]
+    predicted_tier: str
+    confidence: float
+    probabilities: Dict[str, float]
+    top_risk_drivers: List[Dict[str, Any]]
+    top_protective_factors: List[Dict[str, Any]]
+    disclaimer: Optional[str] = None
+
+
+class MealPlanRecord(BaseModel):
+    """Persisted meal plan optimization record."""
+
+    id: Optional[int] = None
+    created_at: Optional[str] = None
+    title: str
+    days: int
+    target_kcal: float
+    daily_plans: List[Dict[str, Any]]
+    grocery_list: List[Dict[str, Any]]
+
+
+class DataExportResponse(BaseModel):
+    """Complete GDPR/HIPAA-compliant personal data export."""
+
+    user: Dict[str, Any]
+    profile: Optional[Dict[str, Any]] = None
+    assessments: List[Dict[str, Any]] = Field(default_factory=list)
+    risk_results: List[Dict[str, Any]] = Field(default_factory=list)
+    meal_plans: List[Dict[str, Any]] = Field(default_factory=list)
+    weight_logs: List[Dict[str, Any]] = Field(default_factory=list)
+    goals_alerts: List[Dict[str, Any]] = Field(default_factory=list)
+    notifications: List[Dict[str, Any]] = Field(default_factory=list)
+    export_timestamp: str
+

@@ -24,9 +24,9 @@ def test_password_hashing_and_verification():
     hash1 = hash_password(pwd)
     hash2 = hash_password(pwd)
 
-    # Hashes must differ due to random 16-byte salt
+    # Hashes must differ due to random salt
     assert hash1 != hash2
-    assert hash1.startswith("pbkdf2:sha256:100000$")
+    assert hash1.startswith("$argon2") or hash1.startswith("pbkdf2:sha256:100000$")
 
     # Correct password verifies
     assert verify_password(pwd, hash1) is True

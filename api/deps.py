@@ -4,9 +4,13 @@ from typing import Any, Dict, Optional
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from sqlalchemy.orm import Session
 
 from nutri.auth.security import decode_access_token
 from nutri.auth.user_db import get_user_db
+from nutri.auth.user_service import format_user_dict
+from nutri.database.engine import SessionLocal
+from nutri.database.models import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token", auto_error=False)
 
@@ -22,10 +26,22 @@ def get_current_user_optional(
     if not payload or "sub" not in payload:
         return None
 
-    username = payload["sub"]
-    db = get_user_db()
-    user = db.get_user_by_username(username)
-    return user
+    identifier = str(payload["sub"])
+    db = SessionLocal()
+    try:
+        user = (
+            db.query(User)
+            .filter((User.username == identifier) | (User.email == identifier.lower()))
+            .first()
+        )
+        if user and user.is_active:
+            return format_user_dict(user)
+    finally:
+        db.close()
+
+    # Fallback to UserDB
+    legacy_db = get_user_db()
+    return legacy_db.get_user_by_username(identifier) or legacy_db.get_user_by_email(identifier)
 
 
 def get_current_user(
@@ -43,21 +59,40 @@ def get_current_user(
     if not payload or "sub" not in payload:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid, expired, or malformed authentication token.",
+            detail="Session expired or invalid token. Please sign in again.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    username = payload["sub"]
-    db = get_user_db()
-    user = db.get_user_by_username(username)
-    if not user:
+    identifier = str(payload["sub"])
+    db = SessionLocal()
+    try:
+        user = (
+            db.query(User)
+            .filter((User.username == identifier) | (User.email == identifier.lower()))
+            .first()
+        )
+        if user:
+            if not user.is_active:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="User account is inactive.",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+            return format_user_dict(user)
+    finally:
+        db.close()
+
+    # Fallback to UserDB
+    legacy_db = get_user_db()
+    legacy_user = legacy_db.get_user_by_username(identifier) or legacy_db.get_user_by_email(identifier)
+    if not legacy_user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authenticated user no longer exists.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    return user
+    return legacy_user
 
 
 def require_clinician(
